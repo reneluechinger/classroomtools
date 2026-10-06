@@ -10,7 +10,7 @@ export const CHANGELOG = [
     date: '06.10.2026',
     title: 'Neues Zuhause & aufgeräumte Oberfläche',
     items: [
-      '🔑 Anmeldung per E-Mail-Link oder Code, ganz ohne Passwort.',
+      '🔑 Einmal pro Gerät anmelden, danach bleibst du angemeldet.',
       '📦 Deine Daten aus der alten Version übernimmst du über das Benutzermenü oben rechts: «Daten aus base44 übernehmen».',
       '🧰 Die Werkzeugleiste ist jetzt in «Sitzplan» und «Unterricht» aufgeteilt.',
       '🖨️ Der Drucken-Knopf ist zurück.',

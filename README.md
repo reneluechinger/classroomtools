@@ -9,7 +9,7 @@ Sitzplan-Generator und Unterrichtswerkzeuge für Lehrkräfte: Sitzpläne mit Reg
 | Teil | Lösung |
 |---|---|
 | Frontend | React 18, Vite, Tailwind, shadcn/ui |
-| Login | Supabase Auth, E-Mail-Link oder Code |
+| Login | Supabase Auth, E-Mail + Passwort, einmal pro Gerät (Registrierung gesperrt) |
 | Daten | Supabase Postgres, eine Tabelle `records` mit JSON-Dokumenten, Row Level Security pro Konto |
 | Dateien | Supabase Storage (`seb-files`) |
 | Hosting | GitHub Pages, Deploy per GitHub Actions bei Push auf `main` |

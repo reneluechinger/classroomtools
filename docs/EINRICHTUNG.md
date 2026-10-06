@@ -2,15 +2,15 @@
 
 Diese Anleitung machst du **einmal**. Danach läuft die App von selbst: Jede Änderung im Code wird automatisch veröffentlicht.
 
-Zeitbedarf: etwa 30 Minuten.
+Zeitbedarf: etwa 15 Minuten.
 
 Am Ende hast du:
 
 - die App unter **https://reneluechinger.github.io/classroomtools/**
-- eine eigene Datenbank mit Login per E-Mail-Link
-- den Mailversand über dein Gmail-Konto
+- eine eigene Datenbank, auf die nur du Zugriff hast
+- eine Anmeldung, die du pro Gerät nur einmal machst
 
-Ein Bild dazu: **GitHub** ist das Schaufenster, dort steht die App. **Supabase** ist das Lager dahinter, dort liegen die Daten und die Logins. **Gmail** ist der Briefträger für die Anmelde-Mails.
+Ein Bild dazu: **GitHub** ist das Schaufenster, dort steht die App. **Supabase** ist das abgeschlossene Lager dahinter, dort liegen deine Daten. Den Schlüssel zum Lager hast nur du.
 
 ---
 
@@ -34,69 +34,34 @@ Ein Bild dazu: **GitHub** ist das Schaufenster, dort steht die App. **Supabase**
 3. Öffne im GitHub-Repo die Datei `supabase/schema.sql`, kopiere den ganzen Inhalt und füge ihn ein.
 4. Klicke unten rechts auf **Run**. Es erscheint *Success. No rows returned*.
 
+> **Fehler «FGA Authentication Error. Unauthorized»?** Das meldet das Supabase-Dashboard, nicht das SQL. Meist ist die Anmeldung im Dashboard abgelaufen. Seite neu laden (oder bei Supabase ab- und wieder anmelden) und nochmals **Run** klicken. Das Skript darf mehrfach laufen.
+
 Damit ist die Datenbank fertig. Jede Lehrkraft sieht nur ihre eigenen Daten, das regelt die Datenbank selbst.
 
-### 3. Adresse der App eintragen
+### 3. Dein Konto anlegen
+
+1. Links: **Authentication** → **Users**.
+2. Oben rechts **Add user** → **Create new user**.
+3. Deine E-Mail-Adresse und ein Passwort eingeben. **Auto Confirm User** angehakt lassen.
+4. **Create user**.
+
+Mit diesen Daten meldest du dich in der App an, auf jedem Gerät genau einmal.
+
+### 4. Registrierung sperren
+
+Damit sich niemand sonst ein Konto anlegen kann:
+
+1. Links: **Authentication** → **Sign In / Providers** (bei älteren Projekten: **Providers**).
+2. **Allow new users to sign up** ausschalten.
+3. **Save**.
+
+Später, wenn Kolleginnen und Kollegen dazukommen, legst du ihre Konten genauso unter **Users** an. Jede Person sieht nur ihre eigenen Daten.
+
+### 5. Adresse der App eintragen
 
 1. Links: **Authentication** → **URL Configuration**.
 2. **Site URL:** `https://reneluechinger.github.io/classroomtools/`
-3. Bei **Redirect URLs** auf **Add URL** klicken und eintragen:
-   - `https://reneluechinger.github.io/classroomtools/**`
-   - `http://localhost:5173/**` (nur zum Testen auf dem eigenen Computer)
-4. **Save**.
-
-### 4. Mailversand über Gmail einrichten
-
-**Warum?** Supabase verschickt von sich aus Mails nur an Mitglieder deines Supabase-Teams und höchstens 2 pro Stunde. Für 20 Lehrkräfte reicht das nicht. Mit einem eigenen Mailversand steigt die Grenze auf 30 Mails pro Stunde, und du kannst sie bei Bedarf anheben.
-Quelle: [Supabase Docs, «Send emails with custom SMTP»](https://supabase.com/docs/guides/auth/auth-smtp)
-
-**a) App-Passwort bei Google erstellen**
-
-1. Öffne [myaccount.google.com/security](https://myaccount.google.com/security).
-2. Prüfe, ob die **Bestätigung in zwei Schritten** aktiv ist. Ohne sie gibt es keine App-Passwörter.
-3. Öffne [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords).
-4. Name: `Classroom Tools`, dann **Erstellen**.
-5. Kopiere das 16-stellige Passwort. Es wird nur einmal angezeigt.
-
-**b) In Supabase eintragen**
-
-1. Links: **Authentication** → **Emails** → Tab **SMTP Settings**.
-2. **Enable Custom SMTP** einschalten.
-3. Ausfüllen:
-
-| Feld | Wert |
-|---|---|
-| Sender email | deine Gmail-Adresse |
-| Sender name | `Classroom Tools` |
-| Host | `smtp.gmail.com` |
-| Port number | `465` |
-| Username | deine Gmail-Adresse |
-| Password | das 16-stellige App-Passwort (ohne Leerzeichen) |
-
-4. **Save changes**.
-
-### 5. E-Mail-Texte auf Deutsch und mit Code
-
-So können sich Lehrkräfte auch anmelden, wenn sie die Mail auf dem Handy lesen und die App am Schulcomputer offen haben. Sie tippen dann einfach den Code ab.
-
-1. Links: **Authentication** → **Emails** → Tab **Templates**.
-2. Wähle **Magic Link**.
-   - **Subject:** `Dein Anmeldelink für Classroom Tools`
-   - **Body:** alles löschen und das hier einfügen:
-
-```html
-<h2>Anmelden bei Classroom Tools</h2>
-<p>Klicke auf den Link, um dich anzumelden:</p>
-<p><a href="{{ .ConfirmationURL }}">Jetzt anmelden</a></p>
-<p>Oder tippe diesen Code in der App ein:</p>
-<p style="font-size:28px;font-weight:bold;letter-spacing:6px">{{ .Token }}</p>
-<p style="color:#888">Der Link und der Code gelten eine Stunde. Wenn du dich nicht anmelden wolltest, kannst du diese Mail ignorieren.</p>
-```
-
-3. **Save changes**.
-4. Wähle **Confirm signup** und mach dasselbe. Diese Mail bekommt man bei der allerersten Anmeldung.
-   - **Subject:** `Willkommen bei Classroom Tools`
-   - **Body:** derselbe Text wie oben
+3. **Save**.
 
 ### 6. Die zwei Schlüssel kopieren
 
@@ -133,11 +98,9 @@ Die App wird bei jeder Änderung auf dem Branch `main` automatisch gebaut und ve
 ## Teil C: Testen
 
 1. Öffne **https://reneluechinger.github.io/classroomtools/**
-2. Gib deine E-Mail ein, klicke auf **Anmeldelink senden**.
-3. Öffne die Mail und klicke auf den Link, oder tippe den Code ein.
-4. Oben rechts im Benutzermenü: **Daten aus base44 übernehmen**. Folge den drei Schritten.
-
-Wenn das klappt, schick deinen Kolleginnen und Kollegen den Link. Jede Person meldet sich an und übernimmt ihre Daten selbst über dasselbe Menü.
+2. Melde dich mit E-Mail und Passwort aus Schritt 3 an.
+3. Oben rechts im Benutzermenü: **Daten aus base44 übernehmen**. Folge den drei Schritten.
+4. Auf dem zweiten Gerät (z.B. Schul-PC) einmal anmelden. Die Daten sind dort automatisch auch.
 
 ---
 
@@ -146,7 +109,7 @@ Wenn das klappt, schick deinen Kolleginnen und Kollegen den Link. Jede Person me
 - **Ferien:** Gratis-Projekte bei Supabase pausieren nach 7 Tagen ohne Nutzung. Die GitHub Action «Supabase wachhalten» ruft die Datenbank deshalb alle 3 Tage kurz auf. Falls das Projekt trotzdem pausiert: im Supabase-Dashboard auf **Resume project** klicken. Die Daten bleiben erhalten.
   Quelle: [Supabase Docs, «Project Pausing»](https://supabase.com/docs/guides/platform/free-project-pausing)
 - **GitHub pausiert geplante Actions**, wenn im Repo 60 Tage lang nichts passiert. Du bekommst dann eine Mail von GitHub und kannst sie mit einem Klick wieder einschalten.
-- **Backup:** Jede Lehrkraft kann im Benutzermenü ein Backup ihrer Daten herunterladen und es über dieselbe Import-Seite wieder einspielen.
+- **Backup:** Du kannst im Benutzermenü ein Backup ihrer Daten herunterladen und es über die Import-Seite wieder einspielen.
 - **Die alte base44-App** läuft unabhängig weiter. Änderungen dort landen nicht automatisch in der neuen App. Ein erneuter Import überschreibt die Daten mit dem Stand aus base44, ohne etwas zu verdoppeln.
 
 ## Probleme?
@@ -154,7 +117,6 @@ Wenn das klappt, schick deinen Kolleginnen und Kollegen den Link. Jede Person me
 | Problem | Lösung |
 |---|---|
 | «Supabase ist noch nicht verbunden» | Schritt 7 prüfen: Namen der Secrets genau so schreiben. Danach unter Actions den letzten Lauf mit **Re-run all jobs** neu starten. |
-| Keine Anmelde-Mail | Spam-Ordner prüfen. In Supabase unter **Authentication → Logs** nachsehen. Meist ist das Gmail-App-Passwort falsch. |
-| «Zu viele Versuche» | Supabase begrenzt die Anzahl Mails pro Stunde. Unter **Authentication → Rate Limits** lässt sich das anheben. |
-| Link aus der Mail öffnet eine leere Seite | Schritt 3 prüfen: Site URL und Redirect URLs. |
+| «E-Mail oder Passwort stimmt nicht» | In Supabase unter **Authentication → Users** prüfen, ob dein Konto existiert. Dort lässt sich das Passwort auch neu setzen. |
+| «FGA Authentication Error» im SQL Editor | Supabase-Dashboard neu laden oder ab- und wieder anmelden. |
 | Export-Lesezeichen meldet einen Fehler | In der base44-App eingeloggt sein und das Lesezeichen auf der App selbst klicken, nicht im base44-Editor. |
