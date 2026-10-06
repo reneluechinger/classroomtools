@@ -76,18 +76,14 @@ Beide dürfen öffentlich sein. Den **secret** bzw. **service_role**-Schlüssel 
 
 ## Teil B: GitHub (Veröffentlichung)
 
-### 7. Schlüssel bei GitHub hinterlegen
+### 7. Schlüssel eintragen
 
-1. Öffne [github.com/reneluechinger/classroomtools/settings/secrets/actions](https://github.com/reneluechinger/classroomtools/settings/secrets/actions).
-2. **New repository secret**:
-   - Name: `VITE_SUPABASE_URL`, Secret: die Project URL
-3. Nochmals **New repository secret**:
-   - Name: `VITE_SUPABASE_ANON_KEY`, Secret: der Publishable bzw. anon key
+Die Project URL und der Publishable key stehen in der Datei `.env.production` im Repo. Beide sind öffentlich gedacht, den Schutz übernehmen die Zugriffsregeln der Datenbank. Bei einem neuen Supabase-Projekt dort die Werte ersetzen.
 
 ### 8. GitHub Pages einschalten
 
 1. Öffne [github.com/reneluechinger/classroomtools/settings/pages](https://github.com/reneluechinger/classroomtools/settings/pages).
-2. Bei **Source**: **GitHub Actions** wählen.
+2. Bei **Source**: **GitHub Actions** wählen. (Der erste Deploy versucht das selbst einzuschalten.)
 
 ### 9. Veröffentlichen
 
@@ -116,7 +112,7 @@ Die App wird bei jeder Änderung auf dem Branch `main` automatisch gebaut und ve
 
 | Problem | Lösung |
 |---|---|
-| «Supabase ist noch nicht verbunden» | Schritt 7 prüfen: Namen der Secrets genau so schreiben. Danach unter Actions den letzten Lauf mit **Re-run all jobs** neu starten. |
+| «Supabase ist noch nicht verbunden» | Schritt 7 prüfen: Stehen beide Werte in `.env.production`? Danach unter Actions den letzten Lauf mit **Re-run all jobs** neu starten. |
 | «E-Mail oder Passwort stimmt nicht» | In Supabase unter **Authentication → Users** prüfen, ob dein Konto existiert. Dort lässt sich das Passwort auch neu setzen. |
 | «FGA Authentication Error» im SQL Editor | Supabase-Dashboard neu laden oder ab- und wieder anmelden. |
 | Export-Lesezeichen meldet einen Fehler | In der base44-App eingeloggt sein und das Lesezeichen auf der App selbst klicken, nicht im base44-Editor. |
