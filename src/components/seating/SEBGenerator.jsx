@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { uploadSebFile } from '@/api/storage';
 import { toast } from 'sonner';
-import { Download, Loader2, Copy, Check } from 'lucide-react';
+import { DownloadSimple as Download, CircleNotch as Loader2, Copy, Check } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import QRCode from 'react-qr-code';
@@ -320,7 +320,7 @@ export default function SEBGenerator({ open, onClose }) {
 
   return (
     <DraggableWindow
-      title="🔒 Safe Exam Browser"
+      title="Safe Exam Browser"
       onClose={onClose}
       storageKey="seb_generator"
       defaultWidth={340}

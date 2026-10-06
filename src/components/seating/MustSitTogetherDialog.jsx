@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, Heart, Plus } from 'lucide-react';
+import { X, Heart, Plus } from '@phosphor-icons/react';
 
 export default function MustSitTogetherDialog({ open, onOpenChange, students = [], mustSitTogether = [], onUpdate }) {
   const [studentA, setStudentA] = useState('');

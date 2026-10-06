@@ -1,10 +1,34 @@
 import React from 'react';
-import { X, Sparkles } from 'lucide-react';
+import { X, Sparkle as Sparkles } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
-export const APP_VERSION = '3.0.0';
+export const APP_VERSION = '3.2.0';
 
 export const CHANGELOG = [
+  {
+    version: '3.2.0',
+    date: '06.10.2026',
+    title: 'Sitzpläne anheften & neuer Timer',
+    items: [
+      '📌 Sitzpläne anheften: Der angeheftete Plan öffnet sich automatisch, wenn du Klasse und Zimmer wählst.',
+      '✏️ Sitzpläne beschriften, z.B. «Prüfung» oder «Gruppenarbeit».',
+      '⏱️ Neuer Timer wie in der iOS-Uhr: Drehräder, Schnellwahl, grosser Ring und Endzeit. Am Ende klingelt es.',
+      '🔧 Ein geöffneter älterer Sitzplan bleibt jetzt offen und springt nicht mehr zum neuesten.',
+    ],
+  },
+  {
+    version: '3.1.0',
+    date: '06.10.2026',
+    title: 'Neues Aussehen im iOS-Stil',
+    items: [
+      '✨ Ruhigeres, klareres Design mit Systemschrift, weichen Karten und Glas-Effekt in der Kopfzeile.',
+      '🧰 Alle Unterrichtswerkzeuge sitzen jetzt im Dock am unteren Rand.',
+      '📚 Klasse und Zimmer wählst, erstellst und benennst du über die Menüs oben links.',
+      '🚪 Türen sehen aus wie im Grundriss und lassen sich in 90°-Schritten drehen.',
+      '🖥️ Neuer Knopf «Präsentieren»: Vollbild mit Raumplan und Dock, ideal für den Beamer.',
+      '🔢 Tische und Türen fügst du im Bearbeiten-Modus mit + und − hinzu.',
+    ],
+  },
   {
     version: '3.0.0',
     date: '06.10.2026',

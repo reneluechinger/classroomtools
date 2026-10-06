@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { X, Link2, Plus } from 'lucide-react';
+import { X, LinkSimple as Link2, Plus } from '@phosphor-icons/react';
 import { Checkbox } from "@/components/ui/checkbox";
 
 export default function TableGroupsDialog({ open, onOpenChange, tables = [], tableGroups = [], onUpdate }) {

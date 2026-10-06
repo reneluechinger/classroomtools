@@ -19,7 +19,7 @@ export default function RandomStudentOverlay({ student: initialStudent, students
 
   return (
     <DraggableWindow
-      title="🎲 Zufälliger Schüler"
+      title="Zufall"
       onClose={onClose}
       storageKey="random_student"
       defaultWidth={400}
@@ -27,7 +27,7 @@ export default function RandomStudentOverlay({ student: initialStudent, students
     >
       <div
         className="h-full flex flex-col items-center justify-center gap-3 px-6 py-6 select-none"
-        style={{ background: '#0f172a' }}
+        style={{ background: '#1C1C1E' }}
       >
         {student && (
           <div className="flex flex-col items-center gap-3">

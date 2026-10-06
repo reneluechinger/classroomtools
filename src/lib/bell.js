@@ -1,8 +1,4 @@
-import React, { useState } from 'react';
-import { BellRing } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
-function playHotelBell() {
+export function playHotelBell() {
   const ctx = new (window.AudioContext || window.webkitAudioContext)();
   const now = ctx.currentTime;
   const duration = 3.5;
@@ -45,28 +41,4 @@ function playHotelBell() {
   gain3.gain.exponentialRampToValueAtTime(0.001, now + duration * 0.3);
   osc3.start(now);
   osc3.stop(now + duration * 0.3);
-}
-
-export default function BellButton() {
-  const [ringing, setRinging] = useState(false);
-
-  const handleRing = () => {
-    if (ringing) return;
-    playHotelBell();
-    setRinging(true);
-    setTimeout(() => setRinging(false), 700);
-  };
-
-  return (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={handleRing}
-      className={`transition-all duration-150 ${ringing ? 'scale-110 border-amber-400 text-amber-600 bg-amber-50' : ''}`}
-      title="Aufmerksamkeit rufen"
-    >
-      <BellRing className={`w-4 h-4 mr-1 ${ringing ? 'animate-bounce text-amber-500' : ''}`} />
-      Klingel
-    </Button>
-  );
 }

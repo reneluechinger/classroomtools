@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { entities } from '@/api/db';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { X, Plus, Minus, Mail, Copy, Check } from 'lucide-react';
+import { X, Plus, Minus, Envelope as Mail, Copy, Check } from '@phosphor-icons/react';
 
 function getNextWeekday(dayOfWeek) {
   // dayOfWeek: 1=Monday, 2=Tuesday, ...

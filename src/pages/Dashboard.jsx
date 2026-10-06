@@ -4,10 +4,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import {
-  Shuffle, Save, Printer, Plus, Minus, PencilRuler, Eye,
-  GraduationCap, Users, LayoutDashboard, Dices, Palette, Timer,
-  QrCode, Lock, ListChecks, Mic, UsersRound, DoorOpen, Group,
-} from 'lucide-react';
+  Shuffle, Printer, Eye, PencilRuler, DiceFive, UsersThree, Palette, Timer,
+  Waveform, BellRinging, QrCode, ListChecks, LockKey, SquaresFour, SelectionPlus,
+  ProjectorScreen, ArrowsIn, FloppyDisk,
+} from '@phosphor-icons/react';
+import { SegmentedControl, Stepper } from '@/components/ios';
+import { Switch } from '@/components/ui/switch';
+import ToolDock from '@/components/ToolDock';
+import { playHotelBell } from '@/lib/bell';
 import { useAuth } from '@/lib/AuthContext';
 import UserMenu from '@/components/UserMenu';
 import QuickGuide from '@/components/QuickGuide';
@@ -28,7 +32,6 @@ import TimeTimerOverlay from '@/components/seating/TimeTimerOverlay';
 import GroupGeneratorOverlay from '@/components/seating/GroupGeneratorOverlay';
 import SeatingPlanPanel from '@/components/seating/SeatingPlanPanel';
 import QRCodePanel from '@/components/seating/QRCodePanel';
-import BellButton from '@/components/seating/BellButton';
 import NoiseMeterOverlay from '@/components/seating/NoiseMeterOverlay';
 import TallyListOverlay from '@/components/seating/TallyListOverlay';
 import SEBGenerator from '@/components/seating/SEBGenerator';
@@ -85,6 +88,23 @@ export default function Dashboard() {
   const [showTally, setShowTally] = useState(false);
   const [showSEB, setShowSEB] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [isPresenting, setIsPresenting] = useState(false);
+
+  // Präsentieren: Vollbild, nur Raumplan und Dock
+  const togglePresenting = () => {
+    if (!isPresenting) {
+      setIsPresenting(true);
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else {
+      setIsPresenting(false);
+      if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    }
+  };
+  useEffect(() => {
+    const onChange = () => { if (!document.fullscreenElement) setIsPresenting(false); };
+    document.addEventListener('fullscreenchange', onChange);
+    return () => document.removeEventListener('fullscreenchange', onChange);
+  }, []);
   const [showGroups, setShowGroups] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
@@ -197,26 +217,31 @@ export default function Dashboard() {
   };
 
   // ─── Data queries ──────────────────────────────────────────────────────────
-  const { data: seatingPlans = [] } = useQuery({
+  const seatingPlansQuery = useQuery({
     queryKey: ['seatingPlans', currentUser?.email, selectedClassId, selectedLayoutId],
     queryFn: () => entities.SeatingPlan.filter({ classId: selectedClassId, layoutId: selectedLayoutId }),
     enabled: !!selectedClassId && !!selectedLayoutId,
   });
 
-  // Auto-load newest seating plan when class+layout change
+  const seatingPlans = seatingPlansQuery.data || [];
+
+  // Beim Wechsel von Klasse oder Zimmer einmal laden: angehefteter Plan, sonst der neueste.
+  // Danach nicht mehr automatisch springen, damit ein geöffneter älterer Plan offen bleibt.
+  const loadedPlanKey = useRef(null);
   useEffect(() => {
-    if (!seatingPlans.length) return;
-    // Sort by updated_date descending, pick newest
-    const sorted = [...seatingPlans].sort((a, b) =>
+    if (!selectedClassId || !selectedLayoutId || !seatingPlansQuery.isSuccess) return;
+    const key = `${selectedClassId}|${selectedLayoutId}`;
+    if (loadedPlanKey.current === key) return;
+    loadedPlanKey.current = key;
+    const pinned = seatingPlans.find(p => p.pinned);
+    const newest = [...seatingPlans].sort((a, b) =>
       new Date(b.updated_date || b.created_date) - new Date(a.updated_date || a.created_date)
-    );
-    const newest = sorted[0];
-    if (newest && newest.id !== activePlanId) {
-      setAssignments(newest.assignments || []);
-      activePlanIdRef.current = newest.id;
-      setActivePlanId(newest.id);
-    }
-  }, [seatingPlans]);
+    )[0];
+    const plan = pinned || newest;
+    setAssignments(plan?.assignments || []);
+    activePlanIdRef.current = plan?.id || null;
+    setActivePlanId(plan?.id || null);
+  }, [selectedClassId, selectedLayoutId, seatingPlansQuery.isSuccess, seatingPlans]);
 
   const selectedClass = classes.find(c => c.id === selectedClassId);
   const selectedLayout = layouts.find(l => l.id === selectedLayoutId);
@@ -472,6 +497,18 @@ export default function Dashboard() {
     saveAssignments(newAssignments, activePlanIdRef.current);
   };
 
+  // Nur ein Plan pro Klasse und Zimmer kann angeheftet sein
+  const handleTogglePin = async (plan) => {
+    const others = seatingPlans.filter(p => p.pinned && p.id !== plan.id);
+    await Promise.all(others.map(p => entities.SeatingPlan.update(p.id, { pinned: false })));
+    updateSeatingPlan.mutate({ id: plan.id, data: { pinned: !plan.pinned } });
+    toast.success(plan.pinned ? 'Nicht mehr angeheftet' : 'Angeheftet: Dieser Plan öffnet sich künftig automatisch');
+  };
+
+  const handleRenamePlan = (plan, label) => {
+    updateSeatingPlan.mutate({ id: plan.id, data: { label } });
+  };
+
   const handleLoadPlan = (plan) => {
     setAssignments(plan.assignments || []);
     activePlanIdRef.current = plan.id;
@@ -520,160 +557,143 @@ export default function Dashboard() {
   };
   const needsSetup = !selectedClassId || !selectedLayoutId || localTables.length === 0 || !hasStudents;
 
+  const toolItems = [
+    { key: 'random', label: 'Zufall', icon: DiceFive, color: 'orange', onClick: pickRandomStudent, disabled: !hasStudents },
+    { key: 'groups', label: 'Gruppen', icon: UsersThree, color: 'indigo', onClick: () => setShowGroups(true), disabled: !hasStudents },
+    { key: 'colors', label: 'Farben', icon: Palette, color: 'pink', onClick: () => setShowColorAssignment(true), disabled: !hasStudents },
+    { key: 'timer', label: 'Timer', icon: Timer, color: 'red', onClick: () => setShowTimer(true) },
+    { key: 'noise', label: 'Lautstärke', icon: Waveform, color: 'green', onClick: () => setShowNoiseMeter(true) },
+    { key: 'bell', label: 'Klingel', icon: BellRinging, color: 'yellow', onClick: playHotelBell, title: 'Aufmerksamkeit rufen' },
+    { key: 'd1', divider: true },
+    { key: 'qr', label: 'QR-Code', icon: QrCode, color: 'blue', onClick: () => setShowQRCode(true) },
+    { key: 'tally', label: 'Strichliste', icon: ListChecks, color: 'teal', onClick: () => setShowTally(true), disabled: !selectedClassId },
+    { key: 'seb', label: 'SEB', icon: LockKey, color: 'gray', onClick: () => setShowSEB(true), title: 'Safe Exam Browser' },
+    { key: 'd2', divider: true },
+    { key: 'arrange', label: 'Anordnen', icon: SquaresFour, color: 'purple', onClick: handleArrangeAll, title: 'Timer, QR-Code, Zufall und Lautstärke im 2×2-Raster' },
+  ];
+
+  const subtitle = [selectedLayout?.name, hasStudents ? `${selectedClass.students.length} Lernende` : null]
+    .filter(Boolean).join(' · ');
+
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="bg-card border-b border-border sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-3 mr-auto">
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-primary-foreground" />
+    <div className={`min-h-screen bg-background flex flex-col ${isEditorMode ? 'pb-6' : 'pb-32'}`}>
+      {/* Navigationsleiste */}
+      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl backdrop-saturate-150 border-b border-border/70">
+        <div className="max-w-[1400px] mx-auto px-4 h-16 flex items-center gap-3">
+          <div className="flex items-center gap-2.5 shrink-0">
+            <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="" className="w-9 h-9 rounded-[10px] shadow-sm" />
+            <span className="hidden md:block text-[17px] font-semibold tracking-tight">Classroom Tools</span>
+          </div>
+          {!isPresenting && (
+            <div className="flex items-center gap-2 min-w-0 overflow-x-auto no-scrollbar md:ml-4">
+              <ClassSelector
+                classes={classes}
+                selectedClassId={selectedClassId}
+                onSelect={handleSelectClass}
+                onCreate={(name) => createClass.mutate(name)}
+                onDelete={(id) => deleteClass.mutate(id)}
+                onRename={(id, name) => updateClass.mutate({ id, data: { name } })}
+              />
+              <LayoutSelector
+                layouts={layouts}
+                selectedLayoutId={selectedLayoutId}
+                onSelect={handleSelectLayout}
+                onCreate={(name) => createLayout.mutate(name)}
+                onDelete={(id) => deleteLayout.mutate(id)}
+                onRename={(id, name) => updateLayout.mutate({ id, data: { name } })}
+              />
             </div>
-            <h1 className="text-xl font-bold tracking-tight">Classroom Tools</h1>
+          )}
+          <div className="ml-auto flex items-center gap-1 shrink-0">
+            <Button
+              variant="ghost" size="sm"
+              onClick={togglePresenting}
+              disabled={isEditorMode}
+              title={isPresenting ? 'Präsentation beenden' : 'Präsentieren: Vollbild für den Beamer'}
+            >
+              {isPresenting ? <ArrowsIn size={18} weight="bold" /> : <ProjectorScreen size={18} weight="bold" />}
+              <span className="hidden sm:inline">{isPresenting ? 'Beenden' : 'Präsentieren'}</span>
+            </Button>
+            {!isPresenting && (
+              <UserMenu
+                email={currentUser?.email}
+                isDarkMode={isDarkMode}
+                onToggleDarkMode={() => setIsDarkMode(v => !v)}
+                onShowChangelog={() => setShowChangelog(true)}
+                onShowGuide={() => setShowGuide(true)}
+              />
+            )}
           </div>
-          <div className="flex items-center gap-4 flex-wrap order-3 w-full lg:order-none lg:w-auto">
-            <ClassSelector
-              classes={classes}
-              selectedClassId={selectedClassId}
-              onSelect={handleSelectClass}
-              onCreate={(name) => createClass.mutate(name)}
-              onDelete={(id) => deleteClass.mutate(id)}
-              onRename={(id, name) => updateClass.mutate({ id, data: { name } })}
-            />
-            <LayoutSelector
-              layouts={layouts}
-              selectedLayoutId={selectedLayoutId}
-              onSelect={handleSelectLayout}
-              onCreate={(name) => createLayout.mutate(name)}
-              onDelete={(id) => deleteLayout.mutate(id)}
-              onRename={(id, name) => updateLayout.mutate({ id, data: { name } })}
-            />
-          </div>
-          <UserMenu
-            email={currentUser?.email}
-            isDarkMode={isDarkMode}
-            onToggleDarkMode={() => setIsDarkMode(v => !v)}
-            onShowChangelog={() => setShowChangelog(true)}
-            onShowGuide={() => setShowGuide(true)}
-          />
         </div>
       </header>
 
-      <main className="max-w-7xl w-full mx-auto px-4 py-6 flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
-          {/* Main Canvas Area */}
+      <main className="max-w-[1400px] w-full mx-auto px-4 pt-5 flex-1">
+        <div className={`grid grid-cols-1 gap-6 ${isPresenting ? '' : 'lg:grid-cols-[1fr_320px]'}`}>
           <div className="space-y-4 min-w-0">
-            {/* Toolbar */}
-            <div className="bg-card border border-border rounded-xl divide-y divide-border">
-              {/* Zeile 1: Sitzplan */}
-              <div className="p-3 flex items-center gap-2 flex-wrap">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground w-20 shrink-0">Sitzplan</span>
-                <Button
-                  variant={isEditorMode ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={handleEditorModeToggle}
-                  disabled={!selectedLayoutId}
-                  title={selectedLayoutId ? '' : 'Zuerst ein Raumlayout wählen'}
-                >
-                  {isEditorMode ? <Eye className="w-4 h-4 mr-1" /> : <PencilRuler className="w-4 h-4 mr-1" />}
-                  {isEditorMode ? 'Fertig' : 'Raum bearbeiten'}
-                </Button>
-
-                {isEditorMode ? (
-                  <>
-                    <div className="h-6 w-px bg-border mx-1" />
-                    <Button variant="outline" size="sm" onClick={handleAddTable}>
-                      <Plus className="w-4 h-4 mr-1" />Tisch
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleRemoveTable} disabled={localTables.length === 0}>
-                      <Minus className="w-4 h-4 mr-1" />Tisch
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleAddDoor}>
-                      <DoorOpen className="w-4 h-4 mr-1" />Tür
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={handleRemoveDoor} disabled={localDoors.length === 0}>
-                      <Minus className="w-4 h-4 mr-1" />Tür
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => setShowTableGroups(true)}>
-                      <Group className="w-4 h-4 mr-1" />Tischgruppen
-                    </Button>
-                    <Button
-                      size="sm"
-                      className="ml-auto"
-                      onClick={handleSaveLayout}
-                      disabled={!selectedLayoutId || !hasUnsavedChanges}
-                    >
-                      <Save className="w-4 h-4 mr-1" />Speichern
-                    </Button>
-                  </>
-                ) : (
-                  <>
-                    <Button
-                      variant={genderMix ? 'secondary' : 'outline'}
-                      size="sm"
-                      onClick={() => setGenderMix(v => !v)}
-                      aria-pressed={genderMix}
-                      title="Wenn aktiv, sitzen möglichst Mädchen und Knaben nebeneinander"
-                      className={genderMix ? 'ring-1 ring-primary/40' : ''}
-                    >
-                      <Users className="w-4 h-4 mr-1" />
-                      Gemischt {genderMix ? 'an' : 'aus'}
-                    </Button>
-                    <Button
-                      variant="outline" size="sm"
-                      onClick={() => setShowPrint(true)}
-                      disabled={!assignments.length}
-                    >
-                      <Printer className="w-4 h-4 mr-1" />Drucken
-                    </Button>
-                    <Button size="sm" className="ml-auto" onClick={handleGenerate} disabled={!selectedClassId || localTables.length === 0}>
-                      <Shuffle className="w-4 h-4 mr-1" />Sitzplan generieren
-                    </Button>
-                  </>
-                )}
+            {/* Grosser Titel */}
+            <div className="flex items-end justify-between gap-4 flex-wrap">
+              <div className="min-w-0">
+                <h1 className="text-[32px] leading-tight font-bold tracking-tight truncate">
+                  {selectedClass?.name || 'Sitzplan'}
+                </h1>
+                <p className="text-[15px] text-muted-foreground truncate">
+                  {subtitle || 'Wähle oben eine Klasse und ein Zimmer'}
+                </p>
               </div>
 
-              {/* Zeile 2: Unterrichtswerkzeuge */}
-              {!isEditorMode && (
-                <div className="p-3 flex items-center gap-2 flex-wrap">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground w-20 shrink-0">Unterricht</span>
-                  <Button variant="outline" size="sm" onClick={pickRandomStudent} disabled={!hasStudents}>
-                    <Dices className="w-4 h-4 mr-1" />Zufall
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => setShowGroups(true)} disabled={!hasStudents}>
-                    <UsersRound className="w-4 h-4 mr-1" />Gruppen
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => setShowColorAssignment(true)} disabled={!hasStudents}>
-                    <Palette className="w-4 h-4 mr-1" />Farben
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => setShowTimer(true)}>
-                    <Timer className="w-4 h-4 mr-1" />Timer
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => setShowNoiseMeter(true)}>
-                    <Mic className="w-4 h-4 mr-1" />Lautstärke
-                  </Button>
-                  <BellButton />
-                  <Button variant="outline" size="sm" onClick={() => setShowQRCode(true)}>
-                    <QrCode className="w-4 h-4 mr-1" />QR-Code
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => setShowTally(true)} disabled={!selectedClassId}>
-                    <ListChecks className="w-4 h-4 mr-1" />Strichliste
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={() => setShowSEB(true)}>
-                    <Lock className="w-4 h-4 mr-1" />SEB
-                  </Button>
-                  <Button
-                    variant="ghost" size="sm"
-                    onClick={handleArrangeAll}
-                    title="Timer, QR-Code, Zufall und Lautstärke im 2×2-Raster öffnen"
-                  >
-                    <LayoutDashboard className="w-4 h-4 mr-1" />Alle anordnen
-                  </Button>
-                </div>
+              {!isPresenting && (
+                <SegmentedControl
+                  value={isEditorMode ? 'edit' : 'plan'}
+                  onChange={(v) => { if ((v === 'edit') !== isEditorMode) handleEditorModeToggle(); }}
+                  options={[
+                    { value: 'plan', label: 'Sitzplan', icon: Eye },
+                    { value: 'edit', label: 'Zimmer bearbeiten', icon: PencilRuler, disabled: !selectedLayoutId },
+                  ]}
+                />
               )}
             </div>
 
-            {/* Canvas */}
+            {/* Steuerleiste */}
+            {!isPresenting && (
+              <div className="bg-card rounded-xl px-4 py-2.5 flex items-center gap-x-5 gap-y-2 flex-wrap min-h-[52px]">
+                {isEditorMode ? (
+                  <>
+                    <Stepper label="Tische" value={localTables.length} onInc={handleAddTable} onDec={handleRemoveTable} decDisabled={!localTables.length} />
+                    <Stepper label="Türen" value={localDoors.length} onInc={handleAddDoor} onDec={handleRemoveDoor} decDisabled={!localDoors.length} />
+                    <Button variant="secondary" size="sm" onClick={() => setShowTableGroups(true)}>
+                      <SelectionPlus size={16} weight="bold" />Tischgruppen
+                    </Button>
+                    <div className="ml-auto flex items-center gap-3">
+                      {hasUnsavedChanges && <span className="text-[13px] text-[#FF9500]">Nicht gesichert</span>}
+                      <Button size="sm" className="rounded-full px-4" onClick={handleSaveLayout} disabled={!selectedLayoutId || !hasUnsavedChanges}>
+                        <FloppyDisk size={16} weight="fill" />Sichern
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <label className="flex items-center gap-2.5 text-[15px] cursor-pointer select-none" title="Möglichst Mädchen und Knaben nebeneinander">
+                      <Switch checked={genderMix} onCheckedChange={setGenderMix} />
+                      Gemischt
+                    </label>
+                    <div className="ml-auto flex items-center gap-2">
+                      <Button variant="secondary" size="sm" onClick={() => setShowPrint(true)} disabled={!assignments.length}>
+                        <Printer size={16} weight="bold" />Drucken
+                      </Button>
+                      <Button size="sm" className="rounded-full px-4" onClick={handleGenerate} disabled={!selectedClassId || localTables.length === 0}>
+                        <Shuffle size={16} weight="bold" />Neu mischen
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Raum so gross wie möglich, aber ganz sichtbar (Höhe begrenzt die Breite) */}
+            <div
+              className="mx-auto w-full"
+              style={{ maxWidth: `calc((100vh - ${isPresenting ? 250 : 330}px) * 900 / 650)`, minWidth: 'min(100%, 320px)' }}
+            >
             <RoomCanvas
               tables={localTables}
               onUpdateTables={handleUpdateTables}
@@ -684,51 +704,49 @@ export default function Dashboard() {
               doors={localDoors}
               onUpdateDoors={handleUpdateDoors}
             />
+            </div>
 
-            {isEditorMode && (
-              <div className="space-y-1">
-                <p className="text-xs text-muted-foreground text-center">
-                  Ziehe Tische und Türen frei auf der Arbeitsfläche. Nutze ↺ / ↻ zum Drehen (15°-Schritte).
-                </p>
-                {hasUnsavedChanges && (
-                  <p className="text-xs text-amber-600 text-center font-medium">⚠ Nicht gespeicherte Änderungen</p>
-                )}
-              </div>
-            )}
-            {!isEditorMode && assignments.length > 0 && (
-              <p className="text-xs text-muted-foreground text-center">
-                Ziehe Lernende per Drag & Drop auf andere Plätze, um sie umzusetzen.
+            {!isPresenting && (
+              <p className="text-[13px] text-muted-foreground text-center">
+                {isEditorMode
+                  ? 'Tische und Türen ziehen. Mit ↺ ↻ drehen.'
+                  : assignments.length > 0 ? 'Lernende per Drag & Drop umsetzen.' : ''}
               </p>
             )}
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-4">
-            {needsSetup && !isEditorMode && <QuickGuide variant="card" />}
+          {!isPresenting && (
+            <aside className="space-y-6">
+              {needsSetup && !isEditorMode && <QuickGuide variant="card" />}
 
-            {selectedClassId && selectedLayoutId && (
-              <SeatingPlanPanel
-                plans={seatingPlans}
-                activePlanId={activePlanId}
-                onLoad={handleLoadPlan}
-                onDelete={(id) => deleteSeatingPlan.mutate(id)}
-              />
-            )}
+              {selectedClassId && selectedLayoutId && (
+                <SeatingPlanPanel
+                  plans={seatingPlans}
+                  activePlanId={activePlanId}
+                  onLoad={handleLoadPlan}
+                  onDelete={(id) => deleteSeatingPlan.mutate(id)}
+                  onTogglePin={handleTogglePin}
+                  onRename={handleRenamePlan}
+                />
+              )}
 
-            {selectedClassId && (
-              <StudentListPanel
-                students={selectedClass?.students || []}
-                assignments={assignments}
-                onOpenImport={() => setShowImport(true)}
-                onOpenBlacklist={() => setShowBlacklist(true)}
-                onOpenMustSitTogether={() => setShowMustSitTogether(true)}
-                onOpenFixedSeats={() => setShowFixedSeats(true)}
-                onRemoveStudent={handleRemoveStudent}
-              />
-            )}
-          </div>
+              {selectedClassId && (
+                <StudentListPanel
+                  students={selectedClass?.students || []}
+                  assignments={assignments}
+                  onOpenImport={() => setShowImport(true)}
+                  onOpenBlacklist={() => setShowBlacklist(true)}
+                  onOpenMustSitTogether={() => setShowMustSitTogether(true)}
+                  onOpenFixedSeats={() => setShowFixedSeats(true)}
+                  onRemoveStudent={handleRemoveStudent}
+                />
+              )}
+            </aside>
+          )}
         </div>
       </main>
+
+      {!isEditorMode && <ToolDock items={toolItems} />}
 
       {/* Dialogs */}
       <CSVImportDialog open={showImport} onOpenChange={setShowImport} onImport={handleImportStudents} />
@@ -810,7 +828,7 @@ export default function Dashboard() {
       )}
       {showGuide && <QuickGuide variant="dialog" onClose={() => setShowGuide(false)} />}
 
-      <footer className="text-center py-4 text-xs text-muted-foreground">
+      <footer className={`text-center py-4 text-xs text-muted-foreground ${isPresenting ? 'hidden' : ''}`}>
         © 2026 René Lüchinger · v{APP_VERSION}
       </footer>
     </div>

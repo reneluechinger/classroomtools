@@ -1,4 +1,5 @@
 import { Toaster } from '@/components/ui/sonner';
+import { IconContext } from '@phosphor-icons/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClientInstance } from '@/lib/query-client';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
@@ -45,13 +46,15 @@ function NotConfigured() {
 export default function App() {
   if (!isConfigured) return <NotConfigured />;
   return (
+    <IconContext.Provider value={{ weight: 'bold' }}>
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
           <AuthenticatedApp />
         </Router>
-        <Toaster position="bottom-center" richColors />
+        <Toaster position="top-center" richColors />
       </QueryClientProvider>
     </AuthProvider>
+    </IconContext.Provider>
   );
 }

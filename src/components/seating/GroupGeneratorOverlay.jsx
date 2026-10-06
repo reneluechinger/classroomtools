@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, RefreshCw } from 'lucide-react';
+import { X, ArrowsClockwise as RefreshCw } from '@phosphor-icons/react';
 
 const GROUP_COLORS = [
   'bg-red-100 border-red-300 text-red-700',

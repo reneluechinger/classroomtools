@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { GraduationCap, LogIn, Loader2 } from 'lucide-react';
+import { SignIn as LogIn, CircleNotch as Loader2 } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/api/supabase';
@@ -27,12 +27,10 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-sm bg-card border border-border rounded-2xl shadow-sm p-8 space-y-6">
+      <div className="w-full max-w-sm bg-card rounded-[22px] shadow-xl p-8 space-y-6">
         <div className="flex flex-col items-center gap-3 text-center">
-          <div className="w-12 h-12 rounded-xl bg-primary flex items-center justify-center">
-            <GraduationCap className="w-6 h-6 text-primary-foreground" />
-          </div>
-          <h1 className="text-xl font-bold">Classroom Tools</h1>
+          <img src={`${import.meta.env.BASE_URL}icon.svg`} alt="" className="w-16 h-16 rounded-[18px] shadow-md" />
+          <h1 className="text-2xl font-bold tracking-tight">Classroom Tools</h1>
           <p className="text-sm text-muted-foreground">
             Einmal anmelden, danach merkt sich dieses Gerät die Anmeldung.
           </p>
@@ -49,7 +47,7 @@ export default function Login() {
             placeholder="Passwort" value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button type="submit" className="w-full" disabled={busy || !email || !password}>
+          <Button type="submit" size="lg" className="w-full" disabled={busy || !email || !password}>
             {busy ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <LogIn className="w-4 h-4 mr-2" />}
             Anmelden
           </Button>
