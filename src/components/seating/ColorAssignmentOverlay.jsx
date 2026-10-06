@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { ArrowsClockwise as RefreshCw } from '@phosphor-icons/react';
 import DraggableWindow from './DraggableWindow';
 
 const COLORS = [
@@ -18,7 +18,7 @@ export default function ColorAssignmentOverlay({ onClose }) {
 
   return (
     <DraggableWindow
-      title="🎨 Farbzuweisung"
+      title="Farben"
       onClose={onClose}
       storageKey="color_assignment"
       defaultWidth={360}

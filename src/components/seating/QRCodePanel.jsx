@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import QRCode from 'react-qr-code';
 import { entities } from '@/api/db';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Trash2, Download, X } from 'lucide-react';
+import { Trash as Trash2, DownloadSimple as Download, X } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
@@ -59,7 +59,7 @@ export default function QRCodePanel({ currentUser, open, onClose }) {
 
   return (
     <DraggableWindow
-      title="🔗 QR-Code Generator"
+      title="QR-Code"
       onClose={onClose}
       storageKey="qr_code_panel"
       defaultWidth={320}

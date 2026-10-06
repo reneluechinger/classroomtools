@@ -1,66 +1,43 @@
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import { ClipboardList, Trash2, Check } from 'lucide-react';
-const fmtFull = (d) => new Date(d).toLocaleString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-const fmtShort = (d) => new Date(d).toLocaleString('de-CH', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+import { Check, Trash } from '@phosphor-icons/react';
+import { Section } from '@/components/ios';
+
+const fmt = (d) => new Date(d).toLocaleString('de-CH', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
 export default function SeatingPlanPanel({ plans = [], activePlanId, onLoad, onDelete }) {
-  if (plans.length === 0) {
-    return (
-      <div className="bg-card border border-border rounded-xl p-4 space-y-2">
-        <h3 className="font-semibold text-sm flex items-center gap-2">
-          <ClipboardList className="w-4 h-4" />
-          Gespeicherte Sitzpläne
-        </h3>
-        <p className="text-xs text-muted-foreground text-center py-3">
-          Noch kein Sitzplan gespeichert. Klicke auf "Generieren".
-        </p>
-      </div>
-    );
-  }
+  const sorted = [...plans].sort((a, b) =>
+    new Date(b.updated_date || b.created_date) - new Date(a.updated_date || a.created_date));
 
   return (
-    <div className="bg-card border border-border rounded-xl p-4 space-y-3">
-      <h3 className="font-semibold text-sm flex items-center gap-2">
-        <ClipboardList className="w-4 h-4" />
-        Gespeicherte Sitzpläne
-        <span className="ml-auto text-xs text-muted-foreground font-normal">{plans.length}</span>
-      </h3>
-
-      <div className="space-y-1 max-h-52 overflow-y-auto">
-        {plans.map(plan => {
+    <Section title="Gespeicherte Sitzpläne" footer={plans.length === 0 ? 'Mit «Neu mischen» entsteht der erste Sitzplan.' : null}>
+      <div className="max-h-56 overflow-y-auto">
+        {sorted.map(plan => {
           const isActive = plan.id === activePlanId;
           return (
-            <div
-              key={plan.id}
-              className={`flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm cursor-pointer transition-colors
-                ${isActive ? 'bg-primary/10 border border-primary/30' : 'hover:bg-muted/60 border border-transparent'}`}
-              onClick={() => onLoad(plan)}
-            >
-              {isActive && <Check className="w-3 h-3 text-primary flex-shrink-0" />}
-              <div className="flex-1 min-w-0">
-                <p className="font-medium truncate text-xs">{plan.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {fmtFull(plan.created_date)} Uhr
-                </p>
-                {plan.updated_date && plan.updated_date !== plan.created_date && (
-                  <p className="text-xs text-muted-foreground">
-                    Geänd.: {fmtShort(plan.updated_date)}
-                  </p>
-                )}
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 opacity-40 hover:opacity-100 flex-shrink-0"
-                onClick={(e) => { e.stopPropagation(); onDelete(plan.id); }}
+            <div key={plan.id} className="group flex items-center pl-4 hover:bg-muted transition-colors">
+              <span className="w-5 shrink-0 text-primary">{isActive && <Check size={16} weight="bold" />}</span>
+              <button
+                type="button"
+                onClick={() => onLoad(plan)}
+                className="flex-1 min-w-0 text-left py-2.5 pr-2 border-b border-border group-last:border-b-0"
               >
-                <Trash2 className="w-3 h-3" />
-              </Button>
+                <div className={`text-[15px] truncate ${isActive ? 'font-semibold' : ''}`}>{fmt(plan.updated_date || plan.created_date)}</div>
+                <div className="text-[13px] text-muted-foreground truncate">{plan.name}</div>
+              </button>
+              <div className="self-stretch flex items-center pr-3 border-b border-border group-last:border-b-0">
+                <button
+                  type="button"
+                  onClick={() => onDelete(plan.id)}
+                  aria-label="Sitzplan löschen"
+                  className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity text-destructive p-1"
+                >
+                  <Trash size={17} />
+                </button>
+              </div>
             </div>
           );
         })}
       </div>
-    </div>
+    </Section>
   );
 }

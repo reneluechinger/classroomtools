@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Upload, FileText, AlertCircle } from 'lucide-react';
+import { UploadSimple as Upload, FileText, WarningCircle as AlertCircle } from '@phosphor-icons/react';
 import { parseCSV } from '@/lib/seating';
 
 export default function CSVImportDialog({ open, onOpenChange, onImport }) {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, MapPin } from 'lucide-react';
+import { X, PushPin as MapPin } from '@phosphor-icons/react';
 
 export default function FixedSeatDialog({ open, onOpenChange, students = [], tables = [], onUpdate }) {
   const [selectedStudentId, setSelectedStudentId] = useState('');

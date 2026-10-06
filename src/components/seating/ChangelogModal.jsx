@@ -1,10 +1,23 @@
 import React from 'react';
-import { X, Sparkles } from 'lucide-react';
+import { X, Sparkle as Sparkles } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
-export const APP_VERSION = '3.0.0';
+export const APP_VERSION = '3.1.0';
 
 export const CHANGELOG = [
+  {
+    version: '3.1.0',
+    date: '06.10.2026',
+    title: 'Neues Aussehen im iOS-Stil',
+    items: [
+      '✨ Ruhigeres, klareres Design mit Systemschrift, weichen Karten und Glas-Effekt in der Kopfzeile.',
+      '🧰 Alle Unterrichtswerkzeuge sitzen jetzt im Dock am unteren Rand.',
+      '📚 Klasse und Zimmer wählst, erstellst und benennst du über die Menüs oben links.',
+      '🚪 Türen sehen aus wie im Grundriss und lassen sich in 90°-Schritten drehen.',
+      '🖥️ Neuer Knopf «Präsentieren»: Vollbild mit Raumplan und Dock, ideal für den Beamer.',
+      '🔢 Tische und Türen fügst du im Bearbeiten-Modus mit + und − hinzu.',
+    ],
+  },
   {
     version: '3.0.0',
     date: '06.10.2026',

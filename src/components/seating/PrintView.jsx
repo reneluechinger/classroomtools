@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Printer, X } from 'lucide-react';
+import { Printer, X } from '@phosphor-icons/react';
 import RoomCanvas from './RoomCanvas';
 
 const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

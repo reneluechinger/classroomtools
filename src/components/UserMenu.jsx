@@ -1,10 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import {
-  CircleUserRound, Moon, Sun, HelpCircle, Sparkles, Upload, Download, LogOut,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Moon, Sun, Question, Sparkle, CloudArrowUp, DownloadSimple, SignOut } from '@phosphor-icons/react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger,
@@ -42,9 +39,13 @@ export default function UserMenu({ email, isDarkMode, onToggleDarkMode, onShowCh
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full" aria-label="Benutzermenü">
-          <CircleUserRound className="w-6 h-6" />
-        </Button>
+        <button
+          type="button"
+          aria-label="Benutzermenü"
+          className="w-9 h-9 rounded-full bg-gradient-to-b from-[#A1A1AA] to-[#71717A] text-white text-[13px] font-semibold flex items-center justify-center shadow-sm active:scale-95 transition-transform"
+        >
+          {(email || '?').slice(0, 2).toUpperCase()}
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
         <DropdownMenuLabel className="font-normal">
@@ -53,25 +54,25 @@ export default function UserMenu({ email, isDarkMode, onToggleDarkMode, onShowCh
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={(e) => { e.preventDefault(); onToggleDarkMode(); }}>
-          {isDarkMode ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
+          {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
           {isDarkMode ? 'Heller Modus' : 'Dunkler Modus'}
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={onShowGuide}>
-          <HelpCircle className="w-4 h-4 mr-2" />Kurzanleitung
+          <Question size={18} />Kurzanleitung
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={onShowChangelog}>
-          <Sparkles className="w-4 h-4 mr-2" />Was ist neu
+          <Sparkle size={18} />Was ist neu
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={() => navigate('/import')}>
-          <Upload className="w-4 h-4 mr-2" />Daten aus base44 übernehmen
+          <CloudArrowUp size={18} />Daten aus base44 übernehmen
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => downloadBackup(email)}>
-          <Download className="w-4 h-4 mr-2" />Backup herunterladen
+          <DownloadSimple size={18} />Backup herunterladen
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={logout}>
-          <LogOut className="w-4 h-4 mr-2" />Abmelden
+        <DropdownMenuItem onSelect={logout} className="text-destructive focus:text-destructive">
+          <SignOut size={18} />Abmelden
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

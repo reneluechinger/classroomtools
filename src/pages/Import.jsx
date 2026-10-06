@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { ArrowLeft, Bookmark, Copy, Check, FileUp, Loader2, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, BookmarkSimple as Bookmark, Copy, Check, FileArrowUp as FileUp, CircleNotch as Loader2, CheckCircle as CheckCircle2, Warning as AlertTriangle } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 import { entities, upsertRecords } from '@/api/db';
 import { useAuth } from '@/lib/AuthContext';

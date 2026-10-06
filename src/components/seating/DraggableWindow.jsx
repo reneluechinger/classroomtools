@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { X, GripHorizontal } from 'lucide-react';
+import { X } from '@phosphor-icons/react';
 
 const DEFAULT_SIZE = { width: 480, height: 520 };
 const MIN_SIZE = { width: 280, height: 200 };
@@ -98,24 +98,23 @@ export default function DraggableWindow({
   return (
     <div
       ref={windowRef}
-      className={`fixed z-[70] bg-card rounded-2xl shadow-2xl border border-border flex flex-col overflow-hidden ${className}`}
+      className={`fixed z-[70] bg-card rounded-[22px] shadow-[0_20px_60px_rgba(0,0,0,0.25)] ring-1 ring-black/5 dark:ring-white/10 flex flex-col overflow-hidden ${className}`}
       style={{ left: pos.x, top: pos.y, width: pos.width, height: pos.height }}
     >
       {/* Title bar / drag handle */}
       <div
-        className="flex items-center justify-between px-4 py-2.5 bg-muted/60 border-b border-border cursor-grab active:cursor-grabbing select-none flex-shrink-0"
+        className="relative flex items-center justify-center h-11 px-12 bg-card/90 backdrop-blur border-b border-border cursor-grab active:cursor-grabbing select-none flex-shrink-0"
         onMouseDown={onMouseDownDrag}
       >
-        <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-          <GripHorizontal className="w-4 h-4 text-muted-foreground" />
-          {title}
-        </div>
+        <span className="absolute top-1.5 left-1/2 -translate-x-1/2 w-9 h-1 rounded-full bg-foreground/15" />
+        <div className="text-[15px] font-semibold text-foreground truncate pt-1">{title}</div>
         <button
-          className="p-1 rounded-full hover:bg-muted transition-colors"
+          className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-secondary text-muted-foreground flex items-center justify-center hover:text-foreground transition-colors"
           onClick={onClose}
           onMouseDown={e => e.stopPropagation()}
+          aria-label="Schliessen"
         >
-          <X className="w-4 h-4" />
+          <X size={14} weight="bold" />
         </button>
       </div>
 
@@ -129,8 +128,8 @@ export default function DraggableWindow({
         className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize"
         onMouseDown={onMouseDownResize}
         style={{
-          background: 'linear-gradient(135deg, transparent 50%, #94a3b8 50%)',
-          borderRadius: '0 0 0.5rem 0',
+          background: 'linear-gradient(135deg, transparent 55%, rgba(142,142,147,0.5) 55%)',
+          borderRadius: '0 0 22px 0',
         }}
       />
     </div>

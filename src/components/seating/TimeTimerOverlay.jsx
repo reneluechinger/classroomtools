@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Pause, RotateCcw } from 'lucide-react';
+import { Play, Pause, ArrowCounterClockwise as RotateCcw } from '@phosphor-icons/react';
 import DraggableWindow from './DraggableWindow';
 
 export default function TimeTimerOverlay({ onClose }) {
@@ -110,13 +110,13 @@ export default function TimeTimerOverlay({ onClose }) {
 
   return (
     <DraggableWindow
-      title="⏱ Timer"
+      title="Timer"
       onClose={onClose}
       storageKey="time_timer"
       defaultWidth={380}
       defaultHeight={500}
     >
-      <div className="h-full flex flex-col items-center justify-center gap-[2%] px-4 py-4" style={{ background: '#0f172a' }}>
+      <div className="h-full flex flex-col items-center justify-center gap-[2%] px-4 py-4" style={{ background: '#1C1C1E' }}>
         {!running && (
           <p className="text-white/40 text-xs select-none">Ziehe im Kreis um die Zeit einzustellen</p>
         )}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { entities } from '@/api/db';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Mic, MicOff, Volume2 } from 'lucide-react';
+import { Microphone as Mic, MicrophoneSlash as MicOff, SpeakerHigh as Volume2 } from '@phosphor-icons/react';
 import DraggableWindow from './DraggableWindow';
 
 const MODES = [
@@ -127,13 +127,13 @@ export default function NoiseMeterOverlay({ onClose, currentUser }) {
 
   return (
     <DraggableWindow
-      title="🎤 Geräuschpegel"
+      title="Lautstärke"
       onClose={onClose}
       storageKey="noise_meter"
       defaultWidth={420}
       defaultHeight={500}
     >
-      <div className="h-full flex flex-col items-center justify-center gap-4 px-4 py-4 overflow-auto" style={{ background: '#0f172a' }}>
+      <div className="h-full flex flex-col items-center justify-center gap-4 px-4 py-4 overflow-auto" style={{ background: '#1C1C1E' }}>
         {micAllowed === false ? (
           <div className="flex flex-col items-center gap-3 text-center">
             <MicOff className="w-10 h-10 text-red-400" />
