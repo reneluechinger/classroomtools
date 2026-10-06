@@ -13,10 +13,10 @@ jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Datenbank anpingen
-        env:
-          URL: ${{ secrets.VITE_SUPABASE_URL }}
-          KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
         run: |
+          URL=$(grep '^VITE_SUPABASE_URL=' .env.production | cut -d= -f2-)
+          KEY=$(grep '^VITE_SUPABASE_ANON_KEY=' .env.production | cut -d= -f2-)
           curl -sf -X POST "$URL/rest/v1/rpc/keepalive" \
             -H "apikey: $KEY" -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" -d '{}'
