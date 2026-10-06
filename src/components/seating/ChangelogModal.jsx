@@ -2,9 +2,20 @@ import React from 'react';
 import { X, Sparkle as Sparkles } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
-export const APP_VERSION = '3.1.0';
+export const APP_VERSION = '3.2.0';
 
 export const CHANGELOG = [
+  {
+    version: '3.2.0',
+    date: '06.10.2026',
+    title: 'Sitzpläne anheften & neuer Timer',
+    items: [
+      '📌 Sitzpläne anheften: Der angeheftete Plan öffnet sich automatisch, wenn du Klasse und Zimmer wählst.',
+      '✏️ Sitzpläne beschriften, z.B. «Prüfung» oder «Gruppenarbeit».',
+      '⏱️ Neuer Timer wie in der iOS-Uhr: Drehräder, Schnellwahl, grosser Ring und Endzeit. Am Ende klingelt es.',
+      '🔧 Ein geöffneter älterer Sitzplan bleibt jetzt offen und springt nicht mehr zum neuesten.',
+    ],
+  },
   {
     version: '3.1.0',
     date: '06.10.2026',

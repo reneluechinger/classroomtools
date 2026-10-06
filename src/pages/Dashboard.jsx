@@ -217,26 +217,31 @@ export default function Dashboard() {
   };
 
   // ─── Data queries ──────────────────────────────────────────────────────────
-  const { data: seatingPlans = [] } = useQuery({
+  const seatingPlansQuery = useQuery({
     queryKey: ['seatingPlans', currentUser?.email, selectedClassId, selectedLayoutId],
     queryFn: () => entities.SeatingPlan.filter({ classId: selectedClassId, layoutId: selectedLayoutId }),
     enabled: !!selectedClassId && !!selectedLayoutId,
   });
 
-  // Auto-load newest seating plan when class+layout change
+  const seatingPlans = seatingPlansQuery.data || [];
+
+  // Beim Wechsel von Klasse oder Zimmer einmal laden: angehefteter Plan, sonst der neueste.
+  // Danach nicht mehr automatisch springen, damit ein geöffneter älterer Plan offen bleibt.
+  const loadedPlanKey = useRef(null);
   useEffect(() => {
-    if (!seatingPlans.length) return;
-    // Sort by updated_date descending, pick newest
-    const sorted = [...seatingPlans].sort((a, b) =>
+    if (!selectedClassId || !selectedLayoutId || !seatingPlansQuery.isSuccess) return;
+    const key = `${selectedClassId}|${selectedLayoutId}`;
+    if (loadedPlanKey.current === key) return;
+    loadedPlanKey.current = key;
+    const pinned = seatingPlans.find(p => p.pinned);
+    const newest = [...seatingPlans].sort((a, b) =>
       new Date(b.updated_date || b.created_date) - new Date(a.updated_date || a.created_date)
-    );
-    const newest = sorted[0];
-    if (newest && newest.id !== activePlanId) {
-      setAssignments(newest.assignments || []);
-      activePlanIdRef.current = newest.id;
-      setActivePlanId(newest.id);
-    }
-  }, [seatingPlans]);
+    )[0];
+    const plan = pinned || newest;
+    setAssignments(plan?.assignments || []);
+    activePlanIdRef.current = plan?.id || null;
+    setActivePlanId(plan?.id || null);
+  }, [selectedClassId, selectedLayoutId, seatingPlansQuery.isSuccess, seatingPlans]);
 
   const selectedClass = classes.find(c => c.id === selectedClassId);
   const selectedLayout = layouts.find(l => l.id === selectedLayoutId);
@@ -492,6 +497,18 @@ export default function Dashboard() {
     saveAssignments(newAssignments, activePlanIdRef.current);
   };
 
+  // Nur ein Plan pro Klasse und Zimmer kann angeheftet sein
+  const handleTogglePin = async (plan) => {
+    const others = seatingPlans.filter(p => p.pinned && p.id !== plan.id);
+    await Promise.all(others.map(p => entities.SeatingPlan.update(p.id, { pinned: false })));
+    updateSeatingPlan.mutate({ id: plan.id, data: { pinned: !plan.pinned } });
+    toast.success(plan.pinned ? 'Nicht mehr angeheftet' : 'Angeheftet: Dieser Plan öffnet sich künftig automatisch');
+  };
+
+  const handleRenamePlan = (plan, label) => {
+    updateSeatingPlan.mutate({ id: plan.id, data: { label } });
+  };
+
   const handleLoadPlan = (plan) => {
     setAssignments(plan.assignments || []);
     activePlanIdRef.current = plan.id;
@@ -708,6 +725,8 @@ export default function Dashboard() {
                   activePlanId={activePlanId}
                   onLoad={handleLoadPlan}
                   onDelete={(id) => deleteSeatingPlan.mutate(id)}
+                  onTogglePin={handleTogglePin}
+                  onRename={handleRenamePlan}
                 />
               )}
 
