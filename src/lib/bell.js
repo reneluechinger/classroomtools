@@ -48,15 +48,7 @@ export function playChime() {
   renderBell(ctx, ctx.destination, ctx.currentTime + 0.01, { freq: 392, volume: 0.16, length: 4.5 });
 }
 
-// Timer abgelaufen: sanftes «Ding-Dong», zweimal
-export function renderTimerDone(ctx, destination, t) {
-  for (const offset of [0, 1.8]) {
-    renderBell(ctx, destination, t + offset, { freq: 659.25, volume: 0.12, length: 2.5 });       // E5
-    renderBell(ctx, destination, t + offset + 0.55, { freq: 523.25, volume: 0.12, length: 3 });  // C5
-  }
-}
-
+// Timer abgelaufen: derselbe Klangschalen-Schlag wie die Klingel
 export function playTimerDone() {
-  const ctx = getContext();
-  renderTimerDone(ctx, ctx.destination, ctx.currentTime + 0.01);
+  playChime();
 }

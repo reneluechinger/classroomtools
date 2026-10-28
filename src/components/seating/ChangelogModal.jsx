@@ -11,7 +11,7 @@ export const CHANGELOG = [
     title: 'Sanftere Klänge',
     items: [
       '🔔 Die Klingel klingt jetzt wie eine Klangschale: tief, warm und leiser.',
-      '⏱️ Am Ende des Timers ertönt ein sanftes «Ding-Dong» statt der schrillen Hotelglocke.',
+      '⏱️ Am Ende des Timers ertönt derselbe sanfte Klang statt der schrillen Hotelglocke.',
     ],
   },
   {
