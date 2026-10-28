@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import DraggableWindow from './DraggableWindow';
-import { playHotelBell } from '@/lib/bell';
+import { playTimerDone } from '@/lib/bell';
 
 // Timer im Stil der iOS-Uhr-App: Drehräder zum Einstellen, grosser Ring beim Ablaufen.
 // Die Restzeit wird aus der Endzeit berechnet, so bleibt der Timer auch im Hintergrund-Tab genau.
@@ -33,7 +33,7 @@ export default function TimeTimerOverlay({ onClose }) {
       if (Date.now() >= endAt) {
         setState('done');
         setLeft(0);
-        playHotelBell();
+        playTimerDone();
       } else {
         tick((t) => t + 1);
       }
