@@ -2,9 +2,18 @@ import React from 'react';
 import { X, Sparkle as Sparkles } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
-export const APP_VERSION = '3.2.0';
+export const APP_VERSION = '3.2.1';
 
 export const CHANGELOG = [
+  {
+    version: '3.2.1',
+    date: '28.10.2026',
+    title: 'Sanftere Klänge',
+    items: [
+      '🔔 Die Klingel klingt jetzt wie eine Klangschale: tief, warm und leiser.',
+      '⏱️ Am Ende des Timers ertönt ein sanftes «Ding-Dong» statt der schrillen Hotelglocke.',
+    ],
+  },
   {
     version: '3.2.0',
     date: '06.10.2026',

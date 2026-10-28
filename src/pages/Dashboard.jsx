@@ -11,7 +11,7 @@ import {
 import { SegmentedControl, Stepper } from '@/components/ios';
 import { Switch } from '@/components/ui/switch';
 import ToolDock from '@/components/ToolDock';
-import { playHotelBell } from '@/lib/bell';
+import { playChime } from '@/lib/bell';
 import { useAuth } from '@/lib/AuthContext';
 import UserMenu from '@/components/UserMenu';
 import QuickGuide from '@/components/QuickGuide';
@@ -563,7 +563,7 @@ export default function Dashboard() {
     { key: 'colors', label: 'Farben', icon: Palette, color: 'pink', onClick: () => setShowColorAssignment(true), disabled: !hasStudents },
     { key: 'timer', label: 'Timer', icon: Timer, color: 'red', onClick: () => setShowTimer(true) },
     { key: 'noise', label: 'Lautstärke', icon: Waveform, color: 'green', onClick: () => setShowNoiseMeter(true) },
-    { key: 'bell', label: 'Klingel', icon: BellRinging, color: 'yellow', onClick: playHotelBell, title: 'Aufmerksamkeit rufen' },
+    { key: 'bell', label: 'Klingel', icon: BellRinging, color: 'yellow', onClick: playChime, title: 'Aufmerksamkeit rufen' },
     { key: 'd1', divider: true },
     { key: 'qr', label: 'QR-Code', icon: QrCode, color: 'blue', onClick: () => setShowQRCode(true) },
     { key: 'tally', label: 'Strichliste', icon: ListChecks, color: 'teal', onClick: () => setShowTally(true), disabled: !selectedClassId },
