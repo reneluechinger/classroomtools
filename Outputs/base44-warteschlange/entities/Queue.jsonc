@@ -1,0 +1,26 @@
+{
+  "name": "Queue",
+  "type": "object",
+  "properties": {
+    "classId": { "type": "string", "description": "ID der SchoolClass" },
+    "className": { "type": "string", "description": "Name der Klasse, z.B. 2a" },
+    "students": {
+      "type": "array",
+      "description": "Namensliste für die Schülerseite: Vorname + Initiale",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" }
+        }
+      }
+    }
+  },
+  "required": ["classId"],
+  "rls": {
+    "create": { "created_by": "{{user.email}}" },
+    "read": true,
+    "update": { "created_by": "{{user.email}}" },
+    "delete": { "created_by": "{{user.email}}" }
+  }
+}
