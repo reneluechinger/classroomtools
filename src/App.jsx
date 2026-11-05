@@ -9,6 +9,7 @@ import { isConfigured } from '@/api/supabase';
 import Dashboard from '@/pages/Dashboard';
 import Login from '@/pages/Login';
 import ImportPage from '@/pages/Import';
+import QueueJoin from '@/pages/QueueJoin';
 
 const Spinner = () => (
   <div className="fixed inset-0 flex items-center justify-center bg-background">
@@ -50,7 +51,11 @@ export default function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <AuthenticatedApp />
+          <Routes>
+            {/* Öffentlich: Lernende stellen sich ohne Login an */}
+            <Route path="/warten/:queueId" element={<QueueJoin />} />
+            <Route path="/*" element={<AuthenticatedApp />} />
+          </Routes>
         </Router>
         <Toaster position="top-center" richColors />
       </QueryClientProvider>

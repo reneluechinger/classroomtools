@@ -13,6 +13,7 @@ export const TILE = {
   yellow: 'bg-[#FFCC00]',
   green: 'bg-[#34C759]',
   teal: 'bg-[#30B0C7]',
+  mint: 'bg-[#00C7BE]',
   gray: 'bg-[#8E8E93]',
 };
 

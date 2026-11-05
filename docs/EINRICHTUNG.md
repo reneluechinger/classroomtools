@@ -100,6 +100,17 @@ Die App wird bei jeder Änderung auf dem Branch `main` automatisch gebaut und ve
 
 ---
 
+## Updates der Datenbank
+
+Manche neuen Funktionen brauchen zusätzliche Tabellen. Die Skripte dafür liegen im Ordner `supabase/migrations/`.
+Jedes Skript **einmal** im Supabase **SQL Editor** ausführen (New query → Inhalt einfügen → Run). Mehrfaches Ausführen schadet nicht.
+
+| Skript | Für | Seit |
+|---|---|---|
+| `002_warteschlange.sql` | Warteschlange (Dock → Warten) | v3.3.0 |
+
+Bei einem ganz neuen Supabase-Projekt reicht `supabase/schema.sql`, es enthält alle Updates.
+
 ## Gut zu wissen
 
 - **Ferien:** Gratis-Projekte bei Supabase pausieren nach 7 Tagen ohne Nutzung. Die GitHub Action «Supabase wachhalten» ruft die Datenbank deshalb alle 3 Tage kurz auf. Falls das Projekt trotzdem pausiert: im Supabase-Dashboard auf **Resume project** klicken. Die Daten bleiben erhalten.

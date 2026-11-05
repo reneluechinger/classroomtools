@@ -2,9 +2,20 @@ import React from 'react';
 import { X, Sparkle as Sparkles } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
-export const APP_VERSION = '3.2.1';
+export const APP_VERSION = '3.3.0';
 
 export const CHANGELOG = [
+  {
+    version: '3.3.0',
+    date: '05.11.2026',
+    title: 'Lektionsplanung & Warteschlange',
+    items: [
+      '📝 Neuer Reiter «Lektion»: Rohnotizen eintippen, die App formatiert sie sofort mit Emojis, Sozialformen, Links und QR-Codes.',
+      '📋 «Für OneNote kopieren» übernimmt die ganze Lektion mit Formatierung, «Nur Schülerübersicht» den Ablauf mit Lernzielen.',
+      '🙋 Neue Warteschlange im Dock: Lernende scannen den QR-Code, tippen ihren Namen an und sehen auf dem Handy, wann sie dran sind.',
+      '✅ Du hakst ab, wer erledigt ist. Ein Fehlklick lässt sich zurückholen.',
+    ],
+  },
   {
     version: '3.2.1',
     date: '28.10.2026',
