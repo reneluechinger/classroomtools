@@ -1,0 +1,25 @@
+{
+  "name": "SeatingPlan",
+  "type": "object",
+  "properties": {
+    "name": { "type": "string", "description": "Name of the seating plan" },
+    "classId": { "type": "string", "description": "Reference to SchoolClass" },
+    "layoutId": { "type": "string", "description": "Reference to RoomLayout" },
+    "assignments": {
+      "type": "array",
+      "description": "Student to seat assignments",
+      "items": {
+        "type": "object",
+        "properties": {
+          "tableId": { "type": "string" },
+          "seatIndex": { "type": "number" },
+          "studentId": { "type": "string" }
+        }
+      }
+    },
+    "genderSeparation": { "type": "boolean", "description": "Whether gender separation was enabled" },
+    "pinned": { "type": "boolean", "description": "Angeheftet: öffnet sich automatisch beim Wählen von Klasse und Zimmer" },
+    "label": { "type": "string", "description": "Eigene Beschriftung, z.B. Prüfung" }
+  },
+  "required": ["name", "classId", "layoutId"]
+}

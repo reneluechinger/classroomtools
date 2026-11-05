@@ -90,7 +90,7 @@ export default function QueueOverlay({ schoolClass, currentUser, onClose }) {
   const [current, ...next] = waiting;
 
   return (
-    <DraggableWindow title={`🙋 Warteschlange · ${schoolClass.name}`} onClose={onClose} storageKey="queue" defaultWidth={760} defaultHeight={520}>
+    <DraggableWindow title={`Warteschlange · ${schoolClass.name}`} onClose={onClose} storageKey="queue" defaultWidth={760} defaultHeight={520}>
       {error ? (
         <p className="p-6 text-sm text-destructive">{error}</p>
       ) : (
