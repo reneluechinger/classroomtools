@@ -6,11 +6,13 @@ import { toast } from "sonner";
 import {
   Shuffle, Printer, Eye, PencilRuler, DiceFive, UsersThree, Palette, Timer,
   Waveform, BellRinging, QrCode, ListChecks, LockKey, SquaresFour, SelectionPlus,
-  ProjectorScreen, ArrowsIn, FloppyDisk,
+  ProjectorScreen, ArrowsIn, FloppyDisk, Notebook, HandWaving,
 } from '@phosphor-icons/react';
 import { SegmentedControl, Stepper } from '@/components/ios';
 import { Switch } from '@/components/ui/switch';
 import ToolDock from '@/components/ToolDock';
+import LessonPlanner from '@/components/lesson/LessonPlanner';
+import QueueOverlay from '@/components/seating/QueueOverlay';
 import { playChime } from '@/lib/bell';
 import { useAuth } from '@/lib/AuthContext';
 import UserMenu from '@/components/UserMenu';
@@ -88,6 +90,8 @@ export default function Dashboard() {
   const [showTally, setShowTally] = useState(false);
   const [showSEB, setShowSEB] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [isLessonMode, setIsLessonMode] = useState(false);
+  const [showQueue, setShowQueue] = useState(false);
   const [isPresenting, setIsPresenting] = useState(false);
 
   // Präsentieren: Vollbild, nur Raumplan und Dock
@@ -523,6 +527,20 @@ export default function Dashboard() {
     }
   };
 
+  // Umschalten zwischen Sitzplan, Zimmer bearbeiten und Lektion
+  const handleViewChange = (v) => {
+    if (v === 'lesson') {
+      if (isEditorMode) {
+        if (hasUnsavedChanges) { setShowSaveConfirm(true); return; }
+        setIsEditorMode(false);
+      }
+      setIsLessonMode(true);
+      return;
+    }
+    setIsLessonMode(false);
+    if ((v === 'edit') !== isEditorMode) handleEditorModeToggle();
+  };
+
   const handleConfirmSave = () => {
     handleSaveLayout();
     setShowSaveConfirm(false);
@@ -564,6 +582,7 @@ export default function Dashboard() {
     { key: 'timer', label: 'Timer', icon: Timer, color: 'red', onClick: () => setShowTimer(true) },
     { key: 'noise', label: 'Lautstärke', icon: Waveform, color: 'green', onClick: () => setShowNoiseMeter(true) },
     { key: 'bell', label: 'Klingel', icon: BellRinging, color: 'yellow', onClick: playChime, title: 'Aufmerksamkeit rufen' },
+    { key: 'queue', label: 'Warten', icon: HandWaving, color: 'mint', onClick: () => setShowQueue(true), disabled: !hasStudents, title: 'Warteschlange: Lernende stellen sich per QR-Code an' },
     { key: 'd1', divider: true },
     { key: 'qr', label: 'QR-Code', icon: QrCode, color: 'blue', onClick: () => setShowQRCode(true) },
     { key: 'tally', label: 'Strichliste', icon: ListChecks, color: 'teal', onClick: () => setShowTally(true), disabled: !selectedClassId },
@@ -628,7 +647,7 @@ export default function Dashboard() {
       </header>
 
       <main className="max-w-[1400px] w-full mx-auto px-4 pt-5 flex-1">
-        <div className={`grid grid-cols-1 gap-6 ${isPresenting ? '' : 'lg:grid-cols-[1fr_320px]'}`}>
+        <div className={`grid grid-cols-1 gap-6 ${isPresenting || isLessonMode ? '' : 'lg:grid-cols-[1fr_320px]'}`}>
           <div className="space-y-4 min-w-0">
             {/* Grosser Titel */}
             <div className="flex items-end justify-between gap-4 flex-wrap">
@@ -643,16 +662,21 @@ export default function Dashboard() {
 
               {!isPresenting && (
                 <SegmentedControl
-                  value={isEditorMode ? 'edit' : 'plan'}
-                  onChange={(v) => { if ((v === 'edit') !== isEditorMode) handleEditorModeToggle(); }}
+                  value={isLessonMode ? 'lesson' : isEditorMode ? 'edit' : 'plan'}
+                  onChange={handleViewChange}
                   options={[
                     { value: 'plan', label: 'Sitzplan', icon: Eye },
                     { value: 'edit', label: 'Zimmer bearbeiten', icon: PencilRuler, disabled: !selectedLayoutId },
+                    { value: 'lesson', label: 'Lektion', icon: Notebook },
                   ]}
                 />
               )}
             </div>
 
+            {isLessonMode && !isPresenting ? (
+              <LessonPlanner classId={selectedClassId} className={selectedClass?.name} />
+            ) : (
+            <>
             {/* Steuerleiste */}
             {!isPresenting && (
               <div className="bg-card rounded-xl px-4 py-2.5 flex items-center gap-x-5 gap-y-2 flex-wrap min-h-[52px]">
@@ -713,9 +737,11 @@ export default function Dashboard() {
                   : assignments.length > 0 ? 'Lernende per Drag & Drop umsetzen.' : ''}
               </p>
             )}
+            </>
+            )}
           </div>
 
-          {!isPresenting && (
+          {!isPresenting && !isLessonMode && (
             <aside className="space-y-6">
               {needsSetup && !isEditorMode && <QuickGuide variant="card" />}
 
@@ -813,6 +839,7 @@ export default function Dashboard() {
         <GroupGeneratorOverlay students={selectedClass?.students || []} onClose={() => setShowGroups(false)} />
       )}
       {showChangelog && <ChangelogModal onClose={handleCloseChangelog} />}
+      {showQueue && selectedClass && <QueueOverlay schoolClass={selectedClass} onClose={() => setShowQueue(false)} />}
       {showSEB && <SEBGenerator open={showSEB} onClose={() => setShowSEB(false)} />}
       <QRCodePanel key={`qr-${arrangeKey}`} currentUser={currentUser} open={showQRCode} onClose={() => setShowQRCode(false)} />
 
