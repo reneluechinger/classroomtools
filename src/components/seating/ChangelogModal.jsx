@@ -2,18 +2,9 @@ import React from 'react';
 import { X, Sparkle as Sparkles } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
-export const APP_VERSION = '3.3.1';
+export const APP_VERSION = '3.3.0';
 
 export const CHANGELOG = [
-  {
-    version: '3.3.1',
-    date: '06.11.2026',
-    title: 'Zoom startet immer bei 100 %',
-    items: [
-      '🔍 Zoomen mit zwei Fingern auf dem Trackpad oder mit ⌘ + / ⌘ − vergrössert jetzt die App selbst.',
-      '↩️ Nach dem Neuladen steht der Zoom wieder auf 100 %. Oben erscheint die Zoomstufe, ein Klick darauf setzt sie zurück.',
-    ],
-  },
   {
     version: '3.3.0',
     date: '05.11.2026',
