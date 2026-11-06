@@ -14,7 +14,7 @@ import ToolDock from '@/components/ToolDock';
 import LessonPlanner from '@/components/lesson/LessonPlanner';
 import QueueOverlay from '@/components/seating/QueueOverlay';
 import { playChime } from '@/lib/bell';
-import { useAppZoom } from '@/lib/useAppZoom';
+import { useBrowserZoomHint } from '@/lib/useBrowserZoomHint';
 import { useAuth } from '@/lib/AuthContext';
 import UserMenu from '@/components/UserMenu';
 import QuickGuide from '@/components/QuickGuide';
@@ -94,16 +94,7 @@ export default function Dashboard() {
   const [isLessonMode, setIsLessonMode] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [isPresenting, setIsPresenting] = useState(false);
-
-  // Eigener App-Zoom (Trackpad, ⌘ + / −); startet nach jedem Neuladen bei 100 %
-  const [zoom, setZoom] = useAppZoom();
-  const [viewportH, setViewportH] = useState(window.innerHeight);
-  const [viewportW, setViewportW] = useState(window.innerWidth);
-  useEffect(() => {
-    const onResize = () => { setViewportH(window.innerHeight); setViewportW(window.innerWidth); };
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
+  useBrowserZoomHint();
 
   // Präsentieren: Vollbild, nur Raumplan und Dock
   const togglePresenting = () => {
@@ -635,16 +626,6 @@ export default function Dashboard() {
             </div>
           )}
           <div className="ml-auto flex items-center gap-1 shrink-0">
-            {zoom !== 1 && (
-              <button
-                type="button"
-                onClick={() => setZoom(1)}
-                title="Zoom auf 100 % zurücksetzen"
-                className="h-7 px-3 rounded-full bg-secondary text-[13px] font-semibold tabular-nums hover:bg-secondary/70"
-              >
-                {Math.round(zoom * 100)} %
-              </button>
-            )}
             <Button
               variant="ghost" size="sm"
               onClick={togglePresenting}
@@ -667,12 +648,8 @@ export default function Dashboard() {
         </div>
       </header>
 
-      <main className="max-w-[1400px] w-full mx-auto px-4 pt-5 flex-1" style={{ zoom }}>
-        {/* Seitenleiste nur, wenn genug Platz ist; beim Zoomen rutscht sie wie beim Browser-Zoom nach unten */}
-        <div
-          className="grid grid-cols-1 gap-6"
-          style={!isPresenting && !isLessonMode && viewportW / zoom >= 1024 ? { gridTemplateColumns: 'minmax(0,1fr) 320px' } : undefined}
-        >
+      <main className="max-w-[1400px] w-full mx-auto px-4 pt-5 flex-1">
+        <div className={`grid grid-cols-1 gap-6 ${isPresenting || isLessonMode ? '' : 'lg:grid-cols-[1fr_320px]'}`}>
           <div className="space-y-4 min-w-0">
             {/* Grosser Titel */}
             <div className="flex items-end justify-between gap-4 flex-wrap">
@@ -741,7 +718,7 @@ export default function Dashboard() {
             {/* Raum so gross wie möglich, aber ganz sichtbar (Höhe begrenzt die Breite) */}
             <div
               className="mx-auto w-full"
-              style={{ maxWidth: Math.max(320, ((viewportH - (isPresenting ? 250 : 330)) * 900) / 650), minWidth: 'min(100%, 320px)' }}
+              style={{ maxWidth: `calc((100vh - ${isPresenting ? 250 : 330}px) * 900 / 650)`, minWidth: 'min(100%, 320px)' }}
             >
             <RoomCanvas
               tables={localTables}

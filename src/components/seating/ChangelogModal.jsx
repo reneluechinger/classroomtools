@@ -2,16 +2,16 @@ import React from 'react';
 import { X, Sparkle as Sparkles } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
-export const APP_VERSION = '3.3.1';
+export const APP_VERSION = '3.3.2';
 
 export const CHANGELOG = [
   {
-    version: '3.3.1',
+    version: '3.3.2',
     date: '06.11.2026',
-    title: 'Zoom startet immer bei 100 %',
+    title: 'Zoom wieder wie gewohnt',
     items: [
-      '🔍 Zoomen mit zwei Fingern auf dem Trackpad oder mit ⌘ + / ⌘ − vergrössert jetzt die App selbst.',
-      '↩️ Nach dem Neuladen steht der Zoom wieder auf 100 %. Oben erscheint die Zoomstufe, ein Klick darauf setzt sie zurück.',
+      '🔍 Der eigene App-Zoom ist wieder entfernt, weil die Ränder dabei nicht mehr bündig waren. Zoomen läuft wieder über den Browser.',
+      '💡 Ist der Browser beim Öffnen gezoomt, zeigt die App kurz, wie du ihn mit ⌘ + 0 auf 100 % zurücksetzt.',
     ],
   },
   {
