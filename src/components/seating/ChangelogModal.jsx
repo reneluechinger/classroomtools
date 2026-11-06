@@ -2,9 +2,18 @@ import React from 'react';
 import { X, Sparkle as Sparkles } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/button';
 
-export const APP_VERSION = '3.3.0';
+export const APP_VERSION = '3.3.2';
 
 export const CHANGELOG = [
+  {
+    version: '3.3.2',
+    date: '06.11.2026',
+    title: 'Zoom wieder wie gewohnt',
+    items: [
+      '🔍 Der eigene App-Zoom ist wieder entfernt, weil die Ränder dabei nicht mehr bündig waren. Zoomen läuft wieder über den Browser.',
+      '💡 Ist der Browser beim Öffnen gezoomt, zeigt die App kurz, wie du ihn mit ⌘ + 0 auf 100 % zurücksetzt.',
+    ],
+  },
   {
     version: '3.3.0',
     date: '05.11.2026',

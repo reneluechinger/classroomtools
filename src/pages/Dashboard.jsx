@@ -14,6 +14,7 @@ import ToolDock from '@/components/ToolDock';
 import LessonPlanner from '@/components/lesson/LessonPlanner';
 import QueueOverlay from '@/components/seating/QueueOverlay';
 import { playChime } from '@/lib/bell';
+import { useBrowserZoomHint } from '@/lib/useBrowserZoomHint';
 import { useAuth } from '@/lib/AuthContext';
 import UserMenu from '@/components/UserMenu';
 import QuickGuide from '@/components/QuickGuide';
@@ -93,6 +94,7 @@ export default function Dashboard() {
   const [isLessonMode, setIsLessonMode] = useState(false);
   const [showQueue, setShowQueue] = useState(false);
   const [isPresenting, setIsPresenting] = useState(false);
+  useBrowserZoomHint();
 
   // Präsentieren: Vollbild, nur Raumplan und Dock
   const togglePresenting = () => {
