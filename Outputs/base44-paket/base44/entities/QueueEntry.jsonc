@@ -1,0 +1,18 @@
+{
+  "name": "QueueEntry",
+  "type": "object",
+  "properties": {
+    "queueId": { "type": "string", "description": "ID der Queue" },
+    "studentId": { "type": "string", "description": "ID der lernenden Person aus Queue.students" },
+    "name": { "type": "string", "description": "Anzeigename, z.B. Lea M." },
+    "ownerEmail": { "type": "string", "description": "E-Mail der Lehrkraft (aus Queue.created_by), für die Berechtigungen" },
+    "doneAt": { "type": "string", "format": "date-time", "description": "Leer = wartet noch; gesetzt = erledigt" }
+  },
+  "required": ["queueId", "studentId", "name"],
+  "rls": {
+    "create": true,
+    "read": true,
+    "update": { "ownerEmail": "{{user.email}}" },
+    "delete": { "ownerEmail": "{{user.email}}" }
+  }
+}
