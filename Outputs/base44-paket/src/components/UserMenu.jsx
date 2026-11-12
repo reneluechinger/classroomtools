@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
-import { Moon, Sun, Question, Sparkle, DownloadSimple, SignOut } from '@phosphor-icons/react';
+import { Moon, Sun, Question, Sparkle, DownloadSimple, UploadSimple, SignOut } from '@phosphor-icons/react';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { base44 } from '@/api/base44Client';
+import BackupImportDialog from '@/components/BackupImportDialog';
 import { exportAll } from '@/api/db';
 import { APP_VERSION } from '@/components/seating/ChangelogModal';
 
@@ -33,8 +34,10 @@ async function downloadBackup(email) {
 
 export default function UserMenu({ email, isDarkMode, onToggleDarkMode, onShowChangelog, onShowGuide }) {
   const logout = () => base44.auth.logout(window.location.origin);
+  const [showImport, setShowImport] = useState(false);
 
   return (
+    <>
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
@@ -62,6 +65,9 @@ export default function UserMenu({ email, isDarkMode, onToggleDarkMode, onShowCh
           <Sparkle size={18} />Was ist neu
         </DropdownMenuItem>
         <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={() => setShowImport(true)}>
+          <UploadSimple size={18} />Backup einspielen
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => downloadBackup(email)}>
           <DownloadSimple size={18} />Backup herunterladen
         </DropdownMenuItem>
@@ -71,5 +77,7 @@ export default function UserMenu({ email, isDarkMode, onToggleDarkMode, onShowCh
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    <BackupImportDialog open={showImport} onOpenChange={setShowImport} />
+    </>
   );
 }
