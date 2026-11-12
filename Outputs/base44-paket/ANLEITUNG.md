@@ -19,6 +19,7 @@ Die Ordner bilden die Struktur deines base44-Projekts ab. Jede Datei gehört an 
 | `src/index.css`, `tailwind.config.js` | Farben, Schrift, Rundungen (Grundlage des Designs) |
 | `src/components/ui/*` | Buttons, Felder, Dialoge, Menüs, Schalter im iOS-Stil (ersetzen die bestehenden) |
 | `src/components/ios.jsx`, `ToolDock.jsx`, `UserMenu.jsx`, `QuickGuide.jsx` | Neue Bausteine |
+| `src/components/BackupImportDialog.jsx`, `src/lib/backupImport.js` | Backup aus der GitHub-App einspielen |
 | `src/components/seating/*` | Alle Sitzplan-Bausteine im neuen Design, inkl. Warteschlange und Timer |
 | `src/components/lesson/LessonPlanner.jsx` | Lektionsplanung |
 | `src/lib/seating.js`, `bell.js`, `lessonFormat.js` | Sitzplan-Logik, Klang, Notiz-Erkennung |
@@ -93,6 +94,25 @@ Test:
 - Dock → «Warten»: QR-Code scannen (ohne Login), Namen antippen, am Computer «Erledigt».
 - Reiter «Lektion» → «Beispiel»: rechts erscheint die formatierte Lektion.
 ```
+
+## Daten aus der GitHub-App übernehmen
+
+Klassen mit Lernenden, Zimmer, Sitzpläne (inkl. angeheftet/beschriftet), Strichliste, QR-Codes und Einstellungen.
+
+1. **GitHub-App** öffnen → Benutzermenü (Kreis oben rechts) → **Backup herunterladen**.
+   Es entsteht `classroomtools-backup-JJJJ-MM-TT.json` im Download-Ordner.
+2. **base44-App** öffnen → Benutzermenü → **Backup einspielen** → Datei wählen → **Einspielen**.
+
+Was dabei passiert:
+- Was es in base44 schon gibt, wird mit dem Stand aus dem Backup **aktualisiert**: gleiche ID, oder Klasse/Zimmer mit gleichem Namen, QR-Code mit gleicher Adresse, Strichliste derselben Person.
+- Alles andere wird **neu angelegt**. Verweise (Sitzplan → Klasse und Zimmer) werden automatisch richtig gesetzt.
+- Es wird **nichts gelöscht**. Mehrfaches Einspielen verdoppelt nichts.
+- Nicht enthalten: Warteschlangen und Lektionsentwürfe (diese liegen nur auf dem jeweiligen Gerät bzw. werden neu erstellt).
+
+Dafür braucht es diese Dateien aus dem Paket: `src/lib/backupImport.js`, `src/components/BackupImportDialog.jsx`, `src/components/UserMenu.jsx`.
+Für angeheftete Sitzpläne muss `SeatingPlan` die Felder `pinned` und `label` haben (siehe `base44/entities/SeatingPlan.jsonc`).
+
+Umgekehrt geht es auch: «Backup herunterladen» in base44 erzeugt dieselbe Art Datei.
 
 ## Unterschiede zur GitHub-Version
 
